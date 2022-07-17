@@ -24,7 +24,7 @@ def ComputePrincipalCurvatures(occ):
     minDir = gp_Dir()   # Direction of min. curvature
     maxDir = gp_Dir()   # Direction of max. curvature
 
-    # Create figure?        
+    # Initialize plotting variables?
     if occ.plotting:
         x = []; y = []; z = []
         xMin = []; yMin = []; zMin = []
@@ -35,7 +35,7 @@ def ComputePrincipalCurvatures(occ):
     occ.curvature = []
     for section in occ.sections:
         
-        # Unpack data
+        # Unpack section data
         points = section[0]
         normals = section[1]
         tangents = section[2]
@@ -86,7 +86,7 @@ def ComputePrincipalCurvatures(occ):
             yMax = append(yMax, maxCurvDir[1]) 
             zMax = append(zMax, maxCurvDir[2]) 
             cMax = append(cMax, maxCurvVal)
-                        
+    
     # Plot results?
     if occ.plotting:
         vertices = c_[x.reshape(-1,1), y.reshape(-1,1)]
@@ -100,16 +100,15 @@ def ComputePrincipalCurvatures(occ):
         figure(title='Min. Curvature', visible=False)
         mesh(vertices, faces, colorMin, colormap='jet')
         colorbar('Curvature')
-        quiver3(x, y, z, xMin, yMin, zMin, color='g')                    
-        labels('X (mm)', 'Y (mm)', 'Z (mm)')
-        grid('on')
+        quiver3(x, y, z+1, xMin, yMin, zMin, color='g')                    
+        labels('X (mm)', 'Y (mm)', 'Z (mm)'); grid('on')
+        view(eye=[0, 0, 2.5], dragmode=False, orthographic=True)
         showfig()            
 
         figure(title='Max. Curvature', visible=False)
         mesh(vertices, faces, colorMax, colormap='jet')
         colorbar('Curvature')
-        quiver3(x, y, z, xMax, yMax, zMax, color='g')                    
-        labels('X (mm)', 'Y (mm)', 'Z (mm)')
-        grid('on')
+        quiver3(x, y, z+1, xMax, yMax, zMax, color='g')                    
+        labels('X (mm)', 'Y (mm)', 'Z (mm)'); grid('on')
+        view(eye=[0, 0, 2.5], dragmode=False, orthographic=True)
         showfig()            
-            
