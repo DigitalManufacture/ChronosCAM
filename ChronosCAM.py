@@ -33,7 +33,9 @@ class Window(MainWindow):
         self.add_menu_item("CAM", "Compute Principal Curvatures", lambda:ComputePrincipalCurvatures(self))
 
     def createToolbar(self):
-        self.add_tool_bar(os.path.join(self.getIcon("plot.png")), "Toggle Plotting", self.togglePlotting)
+        self.plotting = self.add_tool_bar([os.path.join(self.getIcon("plot.png")),
+                                           os.path.join(self.getIcon("erase.png"))], 
+                                          "Toggle Plotting", self.togglePlotting)        
         self.add_tool_bar(os.path.join(self.getIcon("erase.png")), "Erase All", self.eraseAll)
 
     def getIcon(self, filename):
@@ -41,10 +43,6 @@ class Window(MainWindow):
             
     def togglePlotting(self):
         self.plotting = not self.plotting
-        if self.plotting:
-            helpdlg(self, "Plotting Enabled!", "Toggle Plots")
-        else:
-            helpdlg(self, "Plotting Disabled!", "Toggle Plots")
         
     def eraseAll(self):
         self.canva._display.Erase()    
@@ -57,14 +55,13 @@ class Window(MainWindow):
                 self.canva._display.Draw(cad[0], True)
                 helpdlg(self, "File successfully imported.", "Import CAD")
             except:
-                errordlg(self, "File cannot be imported.", "Import CAD")    
-
+                errordlg(self, "File cannot be imported.", "Import CAD")
 
 app = QApplication(sys.argv)
 win = Window(size=[1600,900])
-win.show()
 win.canva.InitDriver()
 Grid(win.canva._display)
 win.canva.qApp = app
 win.canva._display.SetBackgroundImage(background())
+win.show()
 sys.exit(app.exec_())

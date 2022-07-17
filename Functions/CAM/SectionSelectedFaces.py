@@ -26,7 +26,7 @@ def SectionSelectedFaces(occ):
         figure(title='Sections', visible=False)
                 
     # Section surface
-    for y in linspace(-14,14,29):
+    for y in linspace(-14,14,15):
         point = gp_Pnt(0, y, 0)
         direction = gp_Dir(0, 1, 0)
         plane = gp_Pln(point, direction)
@@ -34,7 +34,6 @@ def SectionSelectedFaces(occ):
         section = BRepAlgoAPI_Section(shell, plane)
         points, normals, tangents, fuv = section2points(section, shell, direction, sampling)
         occ.sections.append([points, normals, tangents, fuv])
-        print(fuv)
         
         if occ.plotting:
             plot3(points[0], points[1], points[2], color='r')            
