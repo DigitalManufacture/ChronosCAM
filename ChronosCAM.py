@@ -33,9 +33,7 @@ class Window(MainWindow):
         self.add_menu_item("CAM", "Compute Principal Curvatures", lambda:ComputePrincipalCurvatures(self))
 
     def createToolbar(self):
-        self.plotting = self.add_tool_bar([os.path.join(self.getIcon("plot.png")),
-                                           os.path.join(self.getIcon("erase.png"))], 
-                                          "Toggle Plotting", self.togglePlotting)        
+        self.add_tool_bar(os.path.join(self.getIcon("plot.png")), "Toggle Plotting", self.togglePlotting, toggable=True)        
         self.add_tool_bar(os.path.join(self.getIcon("erase.png")), "Erase All", self.eraseAll)
 
     def getIcon(self, filename):
