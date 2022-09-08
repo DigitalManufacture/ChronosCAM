@@ -61,12 +61,13 @@ class Window(MainWindow):
         if len(faces) < 1:
             warndlg(self, "Select surfaces for export.", "Export CAD")
             return
+        shell = face2shell(faces)    
     
         fname = QFileDialog.getSaveFileName(self, 'Select CAD file to Export', os.getcwd(), 'CAD Files (*.stp)')[0]
         faces = self.GetSelection()                  
         if fname:
             try:
-                cad = occexport(fname, faces)
+                cad = occexport(fname, [shell])
                 helpdlg(self, "File successfully exported.", "Export CAD")
             except:
                 errordlg(self, "File export failed.", "Export CAD")        

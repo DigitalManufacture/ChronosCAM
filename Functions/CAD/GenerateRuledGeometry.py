@@ -7,17 +7,21 @@ from math import *
 from numpy import *
 
 from OCC.Core.gp import *
+from OCC.Core.BRepAlgoAPI import *
 from OCC.Core.BRepBuilderAPI import *
+from OCC.Core.BRepPrimAPI import *
 from OCC.Core.GeomAbs import *
 from OCC.Core.GeomAPI import *
 from OCC.Core.TColgp import *
+from OCC.Core.TopLoc import *
+from OCC.Core.TopoDS import *
 
 def GenerateRuledGeometry(occ):
     
     # Define properties
     width = 30
     length = 30
-    depth = 20
+    height = 20
     radius1 = 20
     radius2 = -20
     
@@ -27,7 +31,7 @@ def GenerateRuledGeometry(occ):
     xc1 = linspace(-length/2, -length/2, 64)
     yc1 = radius1*sin(ac1)
     zc1 = radius1*(1-cos(ac1))
-    zc1 += (depth - amin(zc1))
+    zc1 += height
 
     # Generate right-arc
     an2 = asin(width/(2*radius2))
@@ -35,7 +39,7 @@ def GenerateRuledGeometry(occ):
     xc2 = linspace(length/2, length/2, 64)
     yc2 = radius2*sin(ac2)
     zc2 = radius2*(1-cos(ac2))
-    zc2 += (depth - amin(zc2))
+    zc2 += height
     
     # Generate grid
     xGrid = zeros((64,64))
@@ -55,6 +59,25 @@ def GenerateRuledGeometry(occ):
             array2.SetValue(i + 1, j + 1, p)
     bspline = GeomAPI_PointsToBSplineSurface(array2, 3, 8, GeomAbs_C2, 1e-3)  # 1e-3 is the accuracy in mm
     
-    # Convert to face
+    # Convert to face 
     face = BRepBuilderAPI_MakeFace(bspline.Surface(), 1e-6).Shape()  # 1e-6 is the accuracy in mm
-    occ.canva._display.Draw(face, True)  
+
+    # Extrude face upward
+    vector = gp_Vec(0, 0, 100)
+    prism = BRepPrimAPI_MakePrism(face, vector).Shape()
+    
+    # Create base box
+    thick =  amax([amax(zc1), amax(zc2)])
+    box = BRepPrimAPI_MakeBox(width, length, height+thick).Shape()
+
+    # Apply Transform to Box
+    transform = gp_Trsf()
+    transform.SetTranslationPart(gp_Vec(-width/2, -length/2, 0))
+    location = TopLoc_Location(transform)
+    box.Location(location)
+
+    # Finally, cut box with prism
+    solid = TopoDS_Shape(BRepAlgoAPI_Cut(box, prism).Shape())
+    
+    # Display result
+    occ.canva._display.Draw(solid, True)  
