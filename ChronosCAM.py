@@ -27,6 +27,7 @@ class Window(MainWindow):
     def createMenu(self):
         self.add_menu("CAD")
         self.add_menu_item("CAD", "Import from STEP", self.importSTEP)
+        self.add_menu_item("CAD", "Export to STEP", self.exportSTEP)
         self.add_menu_item("CAD", "Generate Ruled Geometry", lambda:GenerateRuledGeometry(self))
         self.add_menu("CAM")
         self.add_menu_item("CAM", "Section Selected Faces", lambda:SectionSelectedFaces(self))
@@ -54,6 +55,22 @@ class Window(MainWindow):
                 helpdlg(self, "File successfully imported.", "Import CAD")
             except:
                 errordlg(self, "File cannot be imported.", "Import CAD")
+                
+    def exportSTEP(self):
+        faces = self.GetSelection()                  
+        if len(faces) < 1:
+            warndlg(self, "Select surfaces for export.", "Export CAD")
+            return
+    
+        fname = QFileDialog.getSaveFileName(self, 'Select CAD file to Export', os.getcwd(), 'CAD Files (*.stp)')[0]
+        faces = self.GetSelection()                  
+        if fname:
+            try:
+                cad = occexport(fname, faces)
+                helpdlg(self, "File successfully exported.", "Export CAD")
+            except:
+                errordlg(self, "File export failed.", "Export CAD")        
+                
 
 app = QApplication(sys.argv)
 win = Window(size=[1600,900])
