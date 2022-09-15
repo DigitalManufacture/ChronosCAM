@@ -51,7 +51,7 @@ def ComputePrincipalCurvatures(occ):
             # Update face?
             if fuv[0,i] != fi:
                 fi = fuv[0,i]
-                face = occ.canva._display.GetFace(fi)
+                face = occ.selection[int(fi)]
                 props = BRepLProp_SLProps(BRepAdaptor_Surface(face), 1, 0.000001)
             
             # Set coordinates of UV point

@@ -12,20 +12,20 @@ from OCC.Tools.Plotly import *
 def SectionSelectedFaces(occ):
 
     sampling = 0.5
-    occ.sections = []
     
     # Get selected faces
-    faces = occ.GetSelection()     
-    if faces == []:
+    occ.selection = occ.GetSelection()     
+    if occ.selection == []:
         warndlg(occ, "Please select faces first!", "Warning")
         return
-    shell = face2shell(faces)
+    shell = face2shell(occ.selection)
 
     # Create figure?        
     if occ.plotting:
         figure(title='Sections', visible=False)
                 
     # Section surface
+    occ.sections = []
     for y in linspace(-14,14,15):
         point = gp_Pnt(0, y, 0)
         direction = gp_Dir(0, 1, 0)

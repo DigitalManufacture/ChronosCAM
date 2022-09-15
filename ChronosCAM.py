@@ -7,12 +7,10 @@ from PyQt5.QtWidgets import QApplication, QFileDialog
 from OCC.Display.backend import load_backend
 load_backend("qt-pyqt5")
 
+import importlib
+
 from OCC.Tools.IO import *
 from OCC.Tools.Viewer import *
-
-from Functions.CAD.GenerateRuledGeometry import *
-from Functions.CAM.SectionSelectedFaces import *
-from Functions.CAM.ComputePrincipalCurvatures import *
 
 class Window(MainWindow):
 
@@ -23,15 +21,21 @@ class Window(MainWindow):
         self.createToolbar()
         self.plotting = False
         self.sections = []
+        
+    def call(self, func_name):
+        module = importlib.import_module(func_name)
+        importlib.reload(module)
+        func = getattr(module, func_name.rpartition('.')[-1])
+        func(self)
 
     def createMenu(self):
         self.add_menu("CAD")
         self.add_menu_item("CAD", "Import from STEP", self.importSTEP)
         self.add_menu_item("CAD", "Export to STEP", self.exportSTEP)
-        self.add_menu_item("CAD", "Generate Ruled Geometry", lambda:GenerateRuledGeometry(self))
+        self.add_menu_item("CAD", "Generate Ruled Geometry",      lambda:self.call('Functions.CAD.GenerateRuledGeometry')) 
         self.add_menu("CAM")
-        self.add_menu_item("CAM", "Section Selected Faces", lambda:SectionSelectedFaces(self))
-        self.add_menu_item("CAM", "Compute Principal Curvatures", lambda:ComputePrincipalCurvatures(self))
+        self.add_menu_item("CAM", "Section Selected Faces",       lambda:self.call('Functions.CAM.SectionSelectedFaces'))
+        self.add_menu_item("CAM", "Compute Principal Curvatures", lambda:self.call('Functions.CAM.ComputePrincipalCurvatures'))
 
     def createToolbar(self):
         self.add_tool_bar(os.path.join(self.getIcon("plot.png")), "Toggle Plotting", self.togglePlotting, toggable=True)        
